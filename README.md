@@ -32,6 +32,17 @@ This connector is a template connector based on the Camunda REST connector, so n
 
 No build or compilation steps are necessary—just add the template and start automating with Glean!
 
+
+## Configuring your Glean Connector
+
+The Glean connector needs the following parameters to successfully run:
+
+- Bearer token
+- HTTP endpoint of your Glean instance
+- Your question you want Glean to responde to
+
+Your answer will contain what Glean has to tell you in JSON.
+
 ## Output
 
 Example output

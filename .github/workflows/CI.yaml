@@ -6,4 +6,14 @@ on:
       - '**'
 
 jobs:
-  test:
+  validate-json:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Validate glean_search_connector.json
+        run: |
+          jq . element-templates/glean_search_connector.json
+        shell: bash
+  

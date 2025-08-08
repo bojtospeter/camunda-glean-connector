@@ -1,0 +1,614 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "GLEAN Search ",
+  "id": "9bbc6199-cba1-42e0-91fd-e31074c51cef",
+  "version": 1752161809888,
+  "description": "Glean Search Connector",
+  "metadata": {
+    "keywords": []
+  },
+  "documentationRef": "https://docs.camunda.io/docs/components/connectors/protocol/rest/",
+  "category": {
+    "id": "connectors",
+    "name": "Connectors"
+  },
+  "appliesTo": [
+    "bpmn:Task"
+  ],
+  "elementType": {
+    "value": "bpmn:ServiceTask"
+  },
+  "groups": [
+    {
+      "id": "authentication",
+      "label": "Authentication"
+    },
+    {
+      "id": "endpoint",
+      "label": "HTTP endpoint"
+    },
+    {
+      "id": "timeout",
+      "label": "Connection timeout"
+    },
+    {
+      "id": "payload",
+      "label": "Payload"
+    },
+    {
+      "id": "output",
+      "label": "Output mapping"
+    },
+    {
+      "id": "error",
+      "label": "Error handling"
+    },
+    {
+      "id": "retries",
+      "label": "Retries"
+    }
+  ],
+  "properties": [
+    {
+      "value": "io.camunda:http-json:1",
+      "binding": {
+        "property": "type",
+        "type": "zeebe:taskDefinition"
+      },
+      "type": "Hidden"
+    },
+    {
+      "id": "authentication.type",
+      "label": "Type",
+      "description": "Choose the authentication type. Select 'None' if no authentication is necessary",
+      "value": "bearer",
+      "group": "authentication",
+      "binding": {
+        "name": "authentication.type",
+        "type": "zeebe:input"
+      },
+      "type": "Hidden",
+      "choices": [
+        {
+          "name": "API key",
+          "value": "apiKey"
+        },
+        {
+          "name": "Basic",
+          "value": "basic"
+        },
+        {
+          "name": "Bearer token",
+          "value": "bearer"
+        },
+        {
+          "name": "None",
+          "value": "noAuth"
+        },
+        {
+          "name": "OAuth 2.0",
+          "value": "oauth-client-credentials-flow"
+        }
+      ]
+    },
+    {
+      "id": "authentication.apiKeyLocation",
+      "label": "Api key location",
+      "description": "Choose type: Send API key in header or as query parameter.",
+      "optional": false,
+      "value": "headers",
+      "constraints": {
+        "notEmpty": true
+      },
+      "group": "authentication",
+      "binding": {
+        "name": "authentication.apiKeyLocation",
+        "type": "zeebe:input"
+      },
+      "condition": {
+        "property": "authentication.type",
+        "equals": "apiKey",
+        "type": "simple"
+      },
+      "type": "Hidden",
+      "choices": [
+        {
+          "name": "Headers",
+          "value": "headers"
+        },
+        {
+          "name": "Query parameters",
+          "value": "query"
+        }
+      ]
+    },
+    {
+      "id": "authentication.name",
+      "label": "API key name",
+      "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
+      "group": "authentication",
+      "binding": {
+        "name": "authentication.name",
+        "type": "zeebe:input"
+      },
+      "condition": {
+        "property": "authentication.type",
+        "equals": "apiKey",
+        "type": "simple"
+      },
+      "type": "Hidden"
+    },
+    {
+      "id": "authentication.value",
+      "label": "API key value",
+      "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
+      "group": "authentication",
+      "binding": {
+        "name": "authentication.value",
+        "type": "zeebe:input"
+      },
+      "condition": {
+        "property": "authentication.type",
+        "equals": "apiKey",
+        "type": "simple"
+      },
+      "type": "Hidden"
+    },
+    {
+      "id": "authentication.username",
+      "label": "Username",
+      "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
+      "group": "authentication",
+      "binding": {
+        "name": "authentication.username",
+        "type": "zeebe:input"
+      },
+      "condition": {
+        "property": "authentication.type",
+        "equals": "basic",
+        "type": "simple"
+      },
+      "type": "Hidden"
+    },
+    {
+      "id": "authentication.password",
+      "label": "Password",
+      "constraints": {
+        "notEmpty": true
+      },
+      "group": "authentication",
+      "binding": {
+        "name": "authentication.password",
+        "type": "zeebe:input"
+      },
+      "condition": {
+        "property": "authentication.type",
+        "equals": "basic",
+        "type": "simple"
+      },
+      "type": "Hidden"
+    },
+    {
+      "id": "authentication.token",
+      "label": "Bearer token",
+      "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
+      "feel": "optional",
+      "group": "authentication",
+      "description": "Your API Glean token",
+      "binding": {
+        "name": "authentication.token",
+        "type": "zeebe:input"
+      },
+      "condition": {
+        "property": "authentication.type",
+        "equals": "bearer",
+        "type": "simple"
+      },
+      "type": "String",
+      "value": "{{secrets.CAMUNDAAGENT_GLEAN}}"
+    },
+    {
+      "id": "authentication.oauthTokenEndpoint",
+      "label": "OAuth 2.0 token endpoint",
+      "description": "The OAuth token endpoint",
+      "optional": false,
+      "constraints": {
+        "notEmpty": true,
+        "pattern": {
+          "value": "^(=|(http://|https://|secrets|\\{\\{).*$)",
+          "message": "Must be a http(s) URL"
+        }
+      },
+      "group": "authentication",
+      "binding": {
+        "name": "authentication.oauthTokenEndpoint",
+        "type": "zeebe:input"
+      },
+      "condition": {
+        "property": "authentication.type",
+        "equals": "oauth-client-credentials-flow",
+        "type": "simple"
+      },
+      "type": "Hidden"
+    },
+    {
+      "id": "authentication.clientId",
+      "label": "Client ID",
+      "description": "Your application's client ID from the OAuth client",
+      "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
+      "group": "authentication",
+      "binding": {
+        "name": "authentication.clientId",
+        "type": "zeebe:input"
+      },
+      "condition": {
+        "property": "authentication.type",
+        "equals": "oauth-client-credentials-flow",
+        "type": "simple"
+      },
+      "type": "Hidden"
+    },
+    {
+      "id": "authentication.clientSecret",
+      "label": "Client secret",
+      "description": "Your application's client secret from the OAuth client",
+      "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
+      "group": "authentication",
+      "binding": {
+        "name": "authentication.clientSecret",
+        "type": "zeebe:input"
+      },
+      "condition": {
+        "property": "authentication.type",
+        "equals": "oauth-client-credentials-flow",
+        "type": "simple"
+      },
+      "type": "Hidden"
+    },
+    {
+      "id": "authentication.audience",
+      "label": "Audience",
+      "description": "The unique identifier of the target API you want to access",
+      "optional": true,
+      "group": "authentication",
+      "binding": {
+        "name": "authentication.audience",
+        "type": "zeebe:input"
+      },
+      "condition": {
+        "property": "authentication.type",
+        "equals": "oauth-client-credentials-flow",
+        "type": "simple"
+      },
+      "type": "Hidden"
+    },
+    {
+      "id": "authentication.clientAuthentication",
+      "label": "Client authentication",
+      "description": "Send client ID and client secret as Basic Auth request in the header, or as client credentials in the request body",
+      "optional": false,
+      "constraints": {
+        "notEmpty": true
+      },
+      "group": "authentication",
+      "binding": {
+        "name": "authentication.clientAuthentication",
+        "type": "zeebe:input"
+      },
+      "condition": {
+        "property": "authentication.type",
+        "equals": "oauth-client-credentials-flow",
+        "type": "simple"
+      },
+      "type": "Dropdown",
+      "choices": [
+        {
+          "name": "Send client credentials in body",
+          "value": "credentialsBody"
+        },
+        {
+          "name": "Send as Basic Auth header",
+          "value": "basicAuthHeader"
+        }
+      ]
+    },
+    {
+      "id": "authentication.scopes",
+      "label": "Scopes",
+      "description": "The scopes which you want to request authorization for (e.g.read:contacts)",
+      "optional": true,
+      "feel": "optional",
+      "group": "authentication",
+      "binding": {
+        "name": "authentication.scopes",
+        "type": "zeebe:input"
+      },
+      "condition": {
+        "property": "authentication.type",
+        "equals": "oauth-client-credentials-flow",
+        "type": "simple"
+      },
+      "type": "String"
+    },
+    {
+      "id": "method",
+      "label": "Method",
+      "optional": false,
+      "value": "POST",
+      "constraints": {
+        "notEmpty": true
+      },
+      "group": "endpoint",
+      "binding": {
+        "name": "method",
+        "type": "zeebe:input"
+      },
+      "type": "Hidden",
+      "choices": [
+        {
+          "name": "POST",
+          "value": "POST"
+        },
+        {
+          "name": "GET",
+          "value": "GET"
+        },
+        {
+          "name": "DELETE",
+          "value": "DELETE"
+        },
+        {
+          "name": "PATCH",
+          "value": "PATCH"
+        },
+        {
+          "name": "PUT",
+          "value": "PUT"
+        }
+      ]
+    },
+    {
+      "id": "url",
+      "label": "URL",
+      "optional": false,
+      "description": "The endpoint for Glean, usually yourcompany-be.glean.com/rest/api/v1/search",
+      "constraints": {
+        "notEmpty": true,
+        "pattern": {
+          "value": "^(=|(http://|https://|secrets|\\{\\{).*$)",
+          "message": "Must be a http(s) URL"
+        }
+      },
+      "group": "endpoint",
+      "binding": {
+        "name": "url",
+        "type": "zeebe:input"
+      },
+      "value": "https://yourcompany-be.glean.com/rest/api/v1/search"
+    },
+    {
+      "id": "headers",
+      "label": "Headers",
+      "description": "Map of HTTP headers to add to the request",
+      "optional": true,
+      "group": "endpoint",
+      "binding": {
+        "name": "headers",
+        "type": "zeebe:input"
+      },
+      "type": "Hidden"
+    },
+    {
+      "id": "queryParameters",
+      "label": "Question",
+      "description": "This is your Question",
+      "group": "endpoint",
+      "binding": {
+        "name": "queryParameters",
+        "type": "zeebe:input"
+      },
+      "type": "Hidden"
+    },
+    {
+      "id": "gleanQuestion",
+      "label": "Question to Glean",
+      "description": "Add your Question to Glean here",
+      "optional": true,
+      "feel": "required",
+      "group": "payload",
+      "binding": {
+        "name": "gleanQuestion",
+        "type": "zeebe:input"
+      },
+      "type": "String",
+      "value": "\"your question\""
+    },
+    {
+      "id": "storeResponse",
+      "label": "Store response",
+      "description": "Store the response as a document in the document store",
+      "optional": false,
+      "value": "=false",
+      "feel": "static",
+      "group": "endpoint",
+      "binding": {
+        "name": "storeResponse",
+        "type": "zeebe:input"
+      },
+      "type": "Boolean"
+    },
+    {
+      "id": "skipEncoding",
+      "label": "Skip URL encoding",
+      "description": "Skip the default URL decoding and encoding behavior",
+      "optional": true,
+      "group": "endpoint",
+      "binding": {
+        "name": "skipEncoding",
+        "type": "zeebe:input"
+      },
+      "type": "Hidden"
+    },
+    {
+      "id": "connectionTimeoutInSeconds",
+      "label": "Connection timeout in seconds",
+      "description": "Defines the connection timeout in seconds, or 0 for an infinite timeout",
+      "optional": false,
+      "value": "=20",
+      "constraints": {
+        "notEmpty": true,
+        "pattern": {
+          "value": "^\\d+$",
+          "message": "Must be a number"
+        }
+      },
+      "feel": "static",
+      "group": "timeout",
+      "binding": {
+        "name": "connectionTimeoutInSeconds",
+        "type": "zeebe:input"
+      },
+      "type": "Number"
+    },
+    {
+      "id": "readTimeoutInSeconds",
+      "label": "Read timeout in seconds",
+      "description": "Timeout in seconds to read data from an established connection or 0 for an infinite timeout",
+      "optional": false,
+      "value": "=20",
+      "constraints": {
+        "notEmpty": true,
+        "pattern": {
+          "value": "^\\d+$",
+          "message": "Must be a number"
+        }
+      },
+      "feel": "static",
+      "group": "timeout",
+      "binding": {
+        "name": "readTimeoutInSeconds",
+        "type": "zeebe:input"
+      },
+      "type": "Number"
+    },
+    {
+      "id": "body",
+      "label": "Request body",
+      "description": "Payload to send with the request",
+      "optional": true,
+      "group": "payload",
+      "binding": {
+        "name": "body",
+        "type": "zeebe:input"
+      },
+      "condition": {
+        "property": "method",
+        "oneOf": [
+          "POST",
+          "PUT",
+          "PATCH"
+        ],
+        "type": "simple"
+      },
+      "type": "Hidden",
+      "value": "={ \"query\": gleanQuestion,\n  \"maxSnippetSize\": 400,\n  \"returnLlmContentOverSnippets\": true,\n  \"pageSize\": 10}"
+    },
+    {
+      "id": "ignoreNullValues",
+      "label": "Ignore null values",
+      "optional": false,
+      "value": "=false",
+      "feel": "static",
+      "group": "payload",
+      "binding": {
+        "name": "ignoreNullValues",
+        "type": "zeebe:input"
+      },
+      "tooltip": "Null values will not be sent",
+      "type": "Boolean"
+    },
+    {
+      "id": "resultVariable",
+      "label": "Result variable",
+      "description": "Name of variable to store the response in",
+      "group": "output",
+      "binding": {
+        "key": "resultVariable",
+        "type": "zeebe:taskHeader"
+      },
+      "type": "String",
+      "value": "debug"
+    },
+    {
+      "id": "resultExpression",
+      "label": "Result expression",
+      "description": "Expression to map the response into process variables",
+      "feel": "required",
+      "group": "output",
+      "binding": {
+        "key": "resultExpression",
+        "type": "zeebe:taskHeader"
+      },
+      "type": "Text",
+      "value": "={\n  gleanResearchResults: \n    flatten(\n      for result in body.results \n        return \n          for snippet in result.snippets \n            return { \n              \"text\": snippet.text, \n              \"url\": result.url \n            }\n    )\n}"
+    },
+    {
+      "id": "errorExpression",
+      "label": "Error expression",
+      "description": "Expression to handle errors. Details in the <a href=\"https://docs.camunda.io/docs/components/connectors/use-connectors/\" target=\"_blank\">documentation</a>.",
+      "feel": "required",
+      "group": "error",
+      "binding": {
+        "key": "errorExpression",
+        "type": "zeebe:taskHeader"
+      },
+      "type": "Text"
+    },
+    {
+      "id": "retryCount",
+      "label": "Retries",
+      "description": "Number of retries",
+      "value": "3",
+      "feel": "optional",
+      "group": "retries",
+      "binding": {
+        "property": "retries",
+        "type": "zeebe:taskDefinition"
+      },
+      "type": "String"
+    },
+    {
+      "id": "retryBackoff",
+      "label": "Retry backoff",
+      "description": "ISO-8601 duration to wait between retries",
+      "value": "PT0S",
+      "group": "retries",
+      "binding": {
+        "key": "retryBackoff",
+        "type": "zeebe:taskHeader"
+      },
+      "type": "String"
+    }
+  ],
+  "icon": {
+    "contents": "data:image/png;base64,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"
+  }
+}

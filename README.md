@@ -1,118 +1,14 @@
-> A Connector template for new C8 outbound connector
->
-> To use this template update the following resources to match the name of your connector:
->
-> * [README](./README.md) (title, description)
-> * [Element Template](./element-templates/template-connector.json)
-> * [POM](./pom.xml) (artifact name, id, description)
-> * [Connector Function](src/main/java/io/camunda/example/MyConnectorFunction.java) (rename, implement, update
-    `OutboundConnector` annotation)
-> * [Service Provider Interface (SPI)](./src/main/resources/META-INF/services/io.camunda.connector.api.outbound.OutboundConnectorFunction) (
-    rename)
->
->
-> about [creating Connectors](https://docs.camunda.io/docs/components/connectors/custom-built-connectors/connector-sdk/#creating-a-custom-connector)
->
-> Check out the [Connectors SDK](https://github.com/camunda/connectors)
 
-# Connector Template
+# Camunda Glean Connector
 
-Camunda Outbound Connector Template
+Supercharge your Camunda workflows with Glean’s AI-powered enterprise search! The Camunda Glean Connector brings intelligent information discovery and automation to your business processes, enabling you to instantly surface relevant knowledge from across your organization and drive smarter, faster decisions at scale.
 
-Emulates a simple outbound connector function that takes a message and echoes it back.
-
-The function will throw an exception if your message starts with `fail`. This can be used to test error handling.
-
-## Build
-
-You can package the Connector by running the following command:
-
-```bash
-mvn clean package
-```
-
-This will create the following artifacts:
-
-- A thin JAR without dependencies.
-- A fat JAR containing all dependencies, potentially shaded to avoid classpath conflicts. This will not include the SDK
-  artifacts since those are in scope `provided` and will be brought along by the respective Connector Runtime executing
-  the Connector.
-
-### Shading dependencies
-
-You can use the `maven-shade-plugin` defined in the [Maven configuration](./pom.xml) to relocate common dependencies
-that are used in other Connectors and
-the [Connector Runtime](https://github.com/camunda/connectors).
-This helps to avoid classpath conflicts when the Connector is executed.
-
-Use the `relocations` configuration in the Maven Shade plugin to define the dependencies that should be shaded.
-The [Maven Shade documentation](https://maven.apache.org/plugins/maven-shade-plugin/examples/class-relocation.html)
-provides more details on relocations.
-
-## API
-
-### Input
-
-| Name     | Description      | Example           | Notes                                                                      |
-|----------|------------------|-------------------|----------------------------------------------------------------------------|
-| username | Mock username    | `alice`           | Has no effect on the function call outcome.                                |
-| token    | Mock token value | `my-secret-token` | Has no effect on the function call outcome.                                |
-| message  | Mock message     | `Hello World`     | Echoed back in the output. If starts with 'fail', an error will be thrown. |
-
-### Output
-
-```json
-{
-  "result":{
-    "myProperty":"Message received: ..."
-  }
-}
-```
-
-### Error codes
-
-| Code | Description                                |
-|------|--------------------------------------------|
-| FAIL | Message starts with 'fail' (ignoring case) |
-
-## Test locally
-
-Run unit tests
-
-```bash
-mvn clean verify
-```
-
-### Test with local runtime
-
-To ensure the seamless functionality of your custom Camunda connector, please follow the steps below:
-
-#### Prerequisites:
+## Prerequisites:
 
 1. Camunda Modeler, which is available in two variants:
     - [Desktop Modeler](https://camunda.com/download/modeler/) for a local installation.
-    - [Web Modeler](https://camunda.com/download/modeler/) for an online experience.
+    - [Web Modeler](https://modeler.camunda.io/) for an online experience with a Camunda SaaS account
 
-2. [Docker](https://www.docker.com/products/docker-desktop), which is required to run the Camunda platform.
-
-#### Setting Up the Environment:
-
-1. Clone the Camunda Platform repository from GitHub:
-
-```shell
-git clone https://github.com/camunda/camunda-platform.git
-```
-
-Navigate to the cloned directory and open docker-compose-core.yaml with your preferred text editor.
-
-Locate the connector image section and comment it out using the # symbol, as you will be executing your connector
-locally.
-
-Initiate the Camunda suite with the following Docker command:
-
-```shell
-docker compose -f docker-compose-core.yaml up
-```
 
 ### Configuring Camunda Modeler
 
@@ -120,42 +16,51 @@ docker compose -f docker-compose-core.yaml up
 2. Add the `element-templates/template-connector.json` to your Modeler configuration as per
    the [Element Templates documentation](https://docs.camunda.io/docs/components/modeler/desktop-modeler/element-templates/configuring-templates/).
 
-### Launching Your Connector
+## Installing the Glean Connector
 
-1. Run `io.camunda.example.LocalConnectorRuntime` to start your connector.
-2. Create and initiate a process that utilizes your newly created connector within the Camunda Modeler. ![Connector in Camunda Modeler](img/img.png)
-3. Verify that the process is running smoothly by accessing Camunda Operate at [localhost:8081](http://localhost:8081).
+This connector is a template connector based on the Camunda REST connector, so no compilation is required. To install and use it in your Camunda project:
 
-Follow these instructions to test and use your custom Camunda connector effectively.
+1. **Download or copy the element template**
+   - Locate the file `element-templates/glean_search_connector.json` in this repository.
+   - Copy it to your Camunda Modeler configuration folder as described in the [Element Templates documentation](https://docs.camunda.io/docs/components/modeler/desktop-modeler/element-templates/configuring-templates/).
 
-### Test with SaaS
+2. **Configure the REST connector in Camunda Platform**
+   - Ensure the REST connector is enabled in your Camunda Platform instance. For SaaS, it is available by default. For self-managed, follow the [REST connector installation guide](https://docs.camunda.io/docs/components/connectors/connectors/rest/).
 
-#### Setting Up the Environment:
+3. **Use the Glean Connector in your BPMN model**
+   - In Camunda Modeler, select the Glean connector from the palette or properties panel, configure it using the element template, and deploy your process.
 
-1. Navigate to Camunda [SaaS](https://console.camunda.io).
-2. Create a cluster using the latest version available.
-3. Select your cluster, then go to the `API` section and click `Create new Client`.
-4. Ensure the `zeebe` checkbox is selected, then click `Create`.
-5. Copy the configuration details displayed under the `Spring Boot` tab.
-6. Paste the copied configuration into your `application.properties` file within your project.
+No build or compilation steps are necessary—just add the template and start automating with Glean!
 
-### Launching Your Connector
+## Output
 
-1. Start your connector by executing `io.camunda.example.LocalConnectorRuntime` in your development environment.
-2. Access the Web Modeler and create a new project.
-3. Click on `Create new`, then select `Upload files`. Upload the connector template from the repository you have.
-4. In the same folder, create a new BPMN diagram.
-5. Design and start a process that incorporates your new connector.
+Example output
+```json
+{
+  "result": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "How do I reset my company password?"
+      },
+      {
+        "role": "assistant",
+        "content": "To reset your company password, visit the internal portal and follow the password reset instructions. If you need further assistance, contact IT support."
+      }
+    ],
+    "chatId": "abc123",
+    "status": "success"
+  }
+}
+```
 
-By adhering to these steps, you can validate the integration of your custom Camunda connector with the SaaS environment.
+### Error codes
 
-## Element Template
+| Code | Description |
+|------|-------------|
+| 200  | OK - Request was successful |
+| 400  | Bad Request - The request was invalid or cannot be otherwise served |
+| 401  | Unauthorized - Authentication credentials were missing or incorrect |
+| 408  | Request Timeout - The server timed out waiting for the request |
+| 429  | Too Many Requests - Rate limit exceeded |
 
-The element template for this sample connector is generated automatically based on the connector
-input class using
-the [Element Template Generator](https://github.com/camunda/connectors/tree/main/element-template-generator/core).
-
-The generation is embedded in the Maven build and can be triggered by running `mvn clean package`.
-
-The generated element template can be found
-in [element-templates/template-connector.json](./element-templates/template-connector.json).
